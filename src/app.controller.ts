@@ -58,20 +58,12 @@ export class AppController {
   }
 
   @Post('whatsapp')
-  whatsapp(@Req() request: Request) {
-   
+  async whatsapp(@Req() request: Request) {
     const { From:user, To:company, WaId, Body, ProfileName, NumMedia } = request.body;
-    const mediaArray: Array<string> = [];
-
-    if (NumMedia) {
-      for (let i = 0; i < NumMedia; i++) {
-        mediaArray.push(request.body[`MediaUrl${i}`]);
-      }
-    }
-
-    const body = `Fala, ${ProfileName}!`
-
-    this.appService.sendMessage({ sender:company, recipient:user, body });
+    
+    const aiResponse = await this.appService.generateAIResponse(Body, ProfileName);
+    
+    this.appService.sendMessage({ sender:company, recipient:user, body: aiResponse });
     console.log(request.body);
   }
 }

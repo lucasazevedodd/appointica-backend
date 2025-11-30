@@ -3,6 +3,7 @@ import Twilio from 'twilio';
 import { MessageRequest } from './types/messageRequest';
 import dotenv from 'dotenv';
 import {google} from 'googleapis';
+import { GoogleGenAI } from '@google/genai';
 
 dotenv.config();
 
@@ -16,6 +17,8 @@ const googleOAuthClient = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_SECRET,
   process.env.GOOGLE_REDIRECT_URI
 )
+
+const genAI = new GoogleGenAI({apiKey: process.env.GOOGLE_GEMINI_API_KEY});
 
 @Injectable()
 export class AppService {
@@ -79,6 +82,20 @@ export class AppService {
       eventId: eventId
     });
     return { message: 'Event deleted successfully' };
+  }
+
+  async generateAIResponse(userMessage: string, userName: string): Promise<string> {
+    const today = new Date().toString();
+    const result = await genAI.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: `Client name: I'm ${userName}. Client message: ${userMessage}.`,
+      config: {
+        temperature: 0.8,
+        systemInstruction: `Your name is Lisa. You are an assistent of Dra Lara Lima, she is a dentist and works from Monday to Wednesday from 14:00 to 18:00. Today is ${today}.`
+      },
+    });
+
+    return result.text || 'Só um minuto...';
   }
 
   async sendMessage({
