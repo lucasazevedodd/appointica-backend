@@ -2,8 +2,11 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
+import googleOauthConfig from './auth/google-oauth.config';
+
 @Module({
-  imports: [],
+  imports: [
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
